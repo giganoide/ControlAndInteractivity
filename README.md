@@ -2,18 +2,15 @@
 http://www.codeproject.com/Articles/1056014/WPF-Lookless-Controls?msg=5177531#xx5177531xx
 
 
-WPF Lookless Controls
+## WPF Lookless Controls
 Nick Polyak, 19 Nov 2015 CPOL
-	   4.89 (31 votes)
-	
-Rate: 	
-vote 1vote 2vote 3vote 4vote 5
-	
-Lookless controls vs User Controls. Lookless controls usage patterns
+
+
+### Lookless controls vs User Controls. Lookless controls usage patterns
 
     Download source - 153.5 KB
 
-Introduction
+### Introduction
 
 I work for a company that started using WPF relatively recently. As a result, a lot of software engineers are switching to programming C# WPF from other platforms and languages. The easiest and most intuitive way of creating a re-usable visual control in WPF is by utilizing the built in VS2015 template for UserControl.
 
@@ -58,8 +55,8 @@ Each of the rows consists of a label (non-editable text), an editable text box a
 The two rows for entering the name and the passcode are represented by two very simple instances of the same EditableTextAndLabelUserControl class.
 
 Here is the MainWindow.xaml code that creates the window:
-Hide   Copy Code
 
+```
 <Window x:Class="UserControlSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -88,12 +85,12 @@ Hide   Copy Code
                                                Grid.Row="1"/>
     </Grid>
 </Window>
-
+```
 The code for EditableTextAndLabelUserControl is also part of the same project contained within XAML file EditableTextAndLabelUserControl.xaml and C# file EditableTextAndLabelUserControl.xaml.cs. (For instructions on how to create a UserControl in Visual Studio, please, check the Appendix A: Creating a UserControl.)
 
 EditableTextAndLabelUserControl.xaml file contains the following simple XAML:
-Hide   Copy Code
 
+```
 <UserControl x:Class="UserControlSample.EditableTextAndLabelUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -110,12 +107,12 @@ Hide   Copy Code
                 Width="30"/>
     </StackPanel>
 </UserControl>
-
+```
 The label is represented by TextBlock named TheLabel; the editable text is represented by TextBox named TheTextBox and the button is represented by Button control named TheClearButton (I like prepending XAML names by prefix "The" in order to distinguish them from the type names).
 
 The WPF XAML parsing engine creates the variables corresponding to the control names. These variables are accessible from the code behind (in our case contained within EditableTextAndLabelUserControl.xaml.cs file. This code is also very simple:
-Hide   Shrink   Copy Code
 
+```
 public partial class EditableTextAndLabelUserControl : UserControl
 {
     public EditableTextAndLabelUserControl()
@@ -161,22 +158,24 @@ public partial class EditableTextAndLabelUserControl : UserControl
         }
     }
 }  
-
+```
 It provides the public string properties Label and EditableText as a means of communicating with the rest of the application and a method Clear() invoked on the 'X' button click (this invocation is wired via the button's click event handler).
-The Drawbacks of UserControls
+
+### The Drawbacks of UserControls
 
 As simple and powerful as UserControls can be, they have an inherent shortcoming - the visual representation is permanently tied to the C# code. The visual representation of EditableTextAndLabelUserControl control discussed above, cannot be changed - it will always remain a TextBlock followed by a TextBox followed by a Button arranged horizontally one after another. To be fair - some extra degree of freedom for UserControls can be achieved by parametrization (in the same way as will be discussed below for Lookless Controls), but their core visual representation is fixed and tied forever to the C# code behind.
 
 The Lookless Controls completely overcome these limitation. They usually consist of a number of non-visual methods and properties and do not impose any constraints on the visual implementation. The visual implementation for the Lookless Controls is provided by XAML templates and styles and can be changed very easily without ANY changes to the control code itself or to the way the Lookless Control interacts with the rest of the application.
-A Lookless Control Example
+
+### A Lookless Control Example
 
 Code for the simple Lookless Control example is located under LooklessControlSample project. When it runs it shows exactly the same Window as the UserControl example above.
 
 Take a look at EditableTextAndLabelControl class located within EditableTextAndLabelControl.cs file. (Note that it is a simple C# file - no special VS templates are necessary to create it).
 
 The class derives from System.Windows.Controls.Control class and it contains two string dependency properties Label and EditableText as well as a method Clear (which simply sets EditableText property to null).
-Hide   Shrink   Copy Code
 
+```
 public class EditableTextAndLabelControl : Control
 {
     #region Label Dependency Property
@@ -220,7 +219,7 @@ public class EditableTextAndLabelControl : Control
         this.EditableText = null;
     }
 }  
-
+```
 The dependency properties code may look like a terrible mess for people who are not used to them, but they can be very easily created with propdp snippet that is built into the Visual Studio, by typing propdp and then providing the name, the type and the default value of the dependency property. You tab in order to switch between the dependency property parts and press 'enter' after you are done.
 
 My propdp snippet (located under CODE/Snippets folder) is a slightly improved version of the one that comes with the Visual Studio. It arranges the code more vertically, provides the container class name automatically and creates a region for every dependency property. This snippet can be copied into the your NetFX30 snippet folder to replace the default propdp snippet. For detailed instructions on installing the snippet, please, look at Appendix B: Installing a Custom propdp Snippet.
@@ -237,8 +236,8 @@ Once you define a dependency property you can use it as if it is a normal proper
 We are mostly interested in the fact that dependency properties can server as the source and the target properties of the WPF bindings. This is very important for the control to be able to communicate with the rest of the application.
 
 For simplicity sake we placed the ControlTemplate for our Lookless Control into the MainWindow.xaml file - the Window.Resources section:
-Hide   Shrink   Copy Code
 
+```
 <ControlTemplate x:Key="PlainHorizontalEditableTextTemplate"
                  TargetType="local:EditableTextAndLabelControl">
     <StackPanel Orientation="Horizontal"
@@ -271,39 +270,39 @@ Hide   Shrink   Copy Code
         </Button>
     </StackPanel>
 </ControlTemplate>
-
+```
 Note that we are using bindings with RelativeSource set to TemplatedParent mode, e.g:
-Hide   Copy Code
 
+```
 <TextBox x:Name="TheTextBox"
      Text="{Binding Path=EditableText,
                     Mode=TwoWay,
                     RelativeSource={RelativeSource TemplatedParent}}"  
 .../>
-
+```
 The RelativeSource TemplatedParent instructs the binding to search for the source property on the control whose control template this XAML code belongs to - in our case, it is the EditableTextAndLabelControl.
 
 There is a shorthand for TemplatedParent binding - instead of writing all this binding XAML above, we could have simply written
-Hide   Copy Code
 
+```
 <TextBox x:Name="TheTextBox"
      Text="{TemplateBinding EditableText}"  
 .../>  
-
+```
 I repeat, the binding above works only because we are programming a control template for a control. A more generic way would be to find the source object of the binding by type using AncestorType property of RelativeSource instead of TemplatedParent:
-Hide   Copy Code
 
+```
 <TextBox x:Name="TheTextBox"
      Text="{Binding Path=EditableText,
                     Mode=TwoWay,
                     RelativeSource={RelativeSource AncestorType=local:EditableTextAndLabelControl}}"  
 .../>
-
+```
 The code above is more generic because it would work anywhere under the visual tree from our EditableTextAndLabelControl, not only in the immediate template. This might be useful if one tries to maximize the XAML re-use by using sub-controls with sub-templates or if one uses DataTemplates instead of ControlTemplate (both topics are beyond the scope of this article).
 
 The Button's Click event is wired to the Clear() method of the EditableTextAndLabelControl via Expression Blend SDK functionality:
-Hide   Copy Code
 
+```
 <Button x:Name="TheClearButton"
         Content="X"
         Width="30">
@@ -314,11 +313,11 @@ Hide   Copy Code
         </i:EventTrigger>
     </i:Interaction.Triggers>
 </Button>  
-
+```
 You do not have to install MS Expression Blend in order to get this functionality. All you need to do is to reference two dlls that can be found under CODE/ExpressionBlenSDK folder: Microsoft.Expression.Interactions.dll and System.Windows.Interactivity.dll.
 
 You also need to set references to two namespaces in your XAML file header:
-Hide   Copy Code
+
 
 xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
 xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"  
@@ -335,8 +334,8 @@ A more common way of wiring an event to C# functionality is by using WPF Command
 Note: The Expression Blend SDK functionality comes with many other popular packages, e.g. if you are using Prism you should already have the required Expression Blend SDK dlls.
 
 The MainWindow's code is very simple and very similar to that of the previous example:
-Hide   Copy Code
 
+```
 <!-- user control for entering the name -->
 <local:EditableTextAndLabelControl Label="Enter your name:"
                                    HorizontalAlignment="Left"
@@ -351,15 +350,15 @@ Hide   Copy Code
                                    Margin="10,0,0,0"
                                    Grid.Row="1"
                                    Template="{StaticResource PlainHorizontalEditableTextTemplate}"/>  
-
+```
 Note the references to the ControlTemplate via the StaticResource markup extension:
-Hide   Copy Code
+
 
 Template="{StaticResource PlainHorizontalEditableTextTemplate}"  
 
 Note that the XAML code for both controls is very similar: we are using the same HorizontalAlignment, VerticalAlignment, Margin and Template properties for both of them. In order to re-use more XAML code we can use a WPF Style that sets those properties:
-Hide   Copy Code
 
+```
 <Style x:Key="TheEditableTextAndLabelControlStyle"
        TargetType="local:EditableTextAndLabelControl">
     <Setter Property="HorizontalAlignment"
@@ -371,12 +370,12 @@ Hide   Copy Code
     <Setter Property="Template"
             Value="{StaticResource PlainHorizontalEditableTextTemplate}"/>
 </Style>  
-
+```
 This style should be placed in the Windows.Resources section of MainWindow.xaml file under the Template's definition (because the style refers to the template).
 
 Then, we can remove the properties defined in the Style from the controls, instead making the controls refer to the style in the following way:
-Hide   Copy Code
 
+```
 <!-- user control for entering the name -->
 <local:EditableTextAndLabelControl Label="Enter your name:"
                                    Template="{StaticResource PlainHorizontalEditableTextTemplate}"
@@ -386,10 +385,10 @@ Hide   Copy Code
 <local:EditableTextAndLabelControl Label="Enter your passcode:"
                                    Grid.Row="1"
                                    Style="{StaticResource TheEditableTextAndLabelControlStyle}" />  
-
+```
 To even further simplify XAML, we can make the Style to be the default style for all EditableTextAndLabelControl by not setting the x:Key property on it. In that case we can even drop the reference to such Style from the controls:
-Hide   Copy Code
 
+```
 <!-- user control for entering the name -->
 <local:EditableTextAndLabelControl Label="Enter your name:"
                                    Template="{StaticResource PlainHorizontalEditableTextTemplate}"/>
@@ -397,17 +396,18 @@ Hide   Copy Code
 <!-- user control for entering the passcode -->
 <local:EditableTextAndLabelControl Label="Enter your passcode:"
                                    Grid.Row="1">   
-
+```
 Finally, the best practice is to place the Styles and Templates into a separate ResourceDictionary file, usually located in a separate folder, so that they could be accessed from multiple places. In the further projects we will have a folder "Styles" containing the ResourceDictionarys for various controls.
-Using Two Different Templates for the same Lookless Control
+
+### Using Two Different Templates for the same Lookless Control
 
 In the next sample I show how to create two completely different templates for the same lookless control. The sample is located under TwoDifferentTemplatesForTheSameLooklessControlSample project.
 
 Here is what you see if you run the project:
 
 Both, on the left and right I am displaying the same EditableTextAndLabelControl control, but on the left I am using PlainHorizontalEditableTextStyle Style and on the right I am using SomeCrazyEditableTextStyle Style:
-Hide   Copy Code
 
+```
 <Grid>
     ...
     <local:EditableTextAndLabelControl Label="Enter your name:"
@@ -421,7 +421,7 @@ Hide   Copy Code
                                        Grid.Column="2"
                                        Grid.Row="1"/>
 </Grid>  
-
+```
 Both Styles are defined in LooklessControlStyles.xaml Resource Dictionary file located under "Styles" project folder:
 
 In order to create a Resource Dictionary, please follow the steps specified in Appending C: Creating a WPF ResourceDictioary File.
@@ -433,8 +433,8 @@ It also has two styles: "PlainHorizontalEditableTextStyle" and "SomeCrazyEditabl
 We are more interested in the "Crazy" Style and Template since the "Plain" ones have been described before.
 
 Here is the XAML of the "Crazy" Style:
-Hide   Copy Code
 
+```
 <Style TargetType="local:EditableTextAndLabelControl"
        x:Key="SomeCrazyEditableTextStyle">
     <Setter Property="HorizontalAlignment"
@@ -446,10 +446,10 @@ Hide   Copy Code
     <Setter Property="Template"
             Value="{StaticResource SomeCrazyEditableTextTemplate}" />
 </Style>  
-
+```
 And here is the "Crazy" Template:
-Hide   Shrink   Copy Code
 
+```
 <ControlTemplate x:Key="SomeCrazyEditableTextTemplate"
                  TargetType="local:EditableTextAndLabelControl">
     <Grid>
@@ -499,12 +499,12 @@ Hide   Shrink   Copy Code
         </ToggleButton>
     </Grid>
 </ControlTemplate>  
-
+```
 Note, that not only we arrange the controls differently, but we are using different controls - e.g. instead of TextBlock we are using Label control and instead of Button, we are using ToggleButton.
 
 Also note, that in order to make the Styles and Templates defined in a separate Resource Dictionary file visible within the MainWindow.xaml, we added the following code to its Window.Resources section:
-Hide   Copy Code
 
+```
 <Window.Resources>
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
@@ -512,34 +512,35 @@ Hide   Copy Code
         </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
 </Window.Resources>  
-
+```
 Often, the referred Resource Dictionary will be in a different project. In that case, the Source property of the merged resource dictionary should be set differently, e.g. assuming that we refer to "Styles/LooklessControlStyles.xaml" in a different project called "Controls" here is how the corresponding line would look:
 Hide   Copy Code
-
+```
 <ResourceDictionary Source="/Controls;Component/Styles/LooklessControlStyles.xaml"/> 
-
+```
 Note, that we also added prefix "Component" to the corresponding path within the project.
-Parametrizing Lookless Controls
+
+### Parametrizing Lookless Controls
 
 We can further improve the re-use of XAML by making it dependent on some dependency properties of the Lookless Control.
 
 If you run ParametrizingLooklessControl project, and start typing the text in its TextBox you will see that the label text is blue, while the editable text is red:
 
 Here is the relevant content of the MainWindow.xaml file
-Hide   Copy Code
 
+```
 <local:EditableTextAndLabelControl Label="Enter your name:"
                                    Foreground="Blue"
                                    EditableTextForeground="Red"
                                    Style="{StaticResource PlainHorizontalEditableTextStyle}"/>  
-
+```
 You can see, that Foreground property of the control is set to "Blue", while the property EditableTextForeground is set to "Red".
 
 Every WPF Control has the Foreground property, so, since EditableTextAndLabelControl class derives from Control it gets the Foreground property automatically.
 
 The dependency property EditableTextForeground has been, however, added to the EditableTextAndLabelControl class:
-Hide   Copy Code
 
+```
 #region EditableTextForeground Dependency Property
 public Brush EditableTextForeground
 {
@@ -556,10 +557,10 @@ DependencyProperty.Register
     new PropertyMetadata(null)
 );
 #endregion EditableTextForeground Dependency Property  
-
+```
 The Template (defined in LooklessControlStyles.xaml file) binds the corresponding TextBlock's and TextBox'es Foreground properties to the Foreground and EditableTextForeground properties of the Control in the following way:
-Hide   Copy Code
 
+```
 <!-- bound to the Label dependency property of the control -->
 <TextBlock x:Name="TheLabel"
            Foreground="{Binding Path=Foreground,
@@ -576,8 +577,8 @@ Hide   Copy Code
                             RelativeSource={RelativeSource TemplatedParent}}"
          Width="100"
          Margin="2,0" />  
-
-Accessing the Visuals From C# Code for Lookless Controls
+```
+### Accessing the Visuals From C# Code for Lookless Controls
 
 Sometimes (though not very often) it is necessary to access the parts defined in a Control Template from the C# code of the control. This, BTW is the only small advantage that UserControls have over Lookless Controls - it is easier to access the visuals defined in XAML for UserControls from C# code.
 
@@ -590,21 +591,21 @@ If you run the project and click on "Enter your name:" label, you will see a mod
 In order to continue working with the main window, you'll have to kill the popup first.
 
 Take a look at the Control Template within LooklessControlStyle.xaml file. The only things that changed in comparison to the previous samples is that the TextBlock has been renamed "PART_Label" and it has a transparent background:
-Hide   Copy Code
 
+```
 <TextBlock x:Name="PART_TheLabel"
            Background="Transparent"
            Text="{Binding Path=Label,
                           RelativeSource={RelativeSource TemplatedParent}}"
            Margin="0,0,2,0" />
-
+```
 Prefix "PART_" for the names of the visuals that might be accessed from within C# code is a WPF useful common practice.
 
 Transparency for the background of the TextBlock is introduced in order to better catch the mouse down events on it (otherwise it would only react when one clicks on the text itself)
 
 The relevant C# code addition is located at the top of EditableTextAndLabelControl.cs file:
-Hide   Copy Code
 
+```
 public class EditableTextAndLabelControl : Control
 {
     FrameworkElement _labelElement = null;
@@ -632,27 +633,30 @@ public class EditableTextAndLabelControl : Control
     }
 ...
 }
+```
 
 We override OnApplyTemplate() method (to make sure that we can find the parts defined in the control template).
 
 Then, we use Template.FindName(...) method to actually find the control.
 
 Other and more powerful ways of finding template parts is to use functionality described in Generic (Non-WPF) Tree to LINQ and Event Propagation on Trees. This approach will be described elsewhere.
-Summary
+
+### Summary
 
 In this article I explain why WPF Lookless Controls are more powerful that User Controls and describe several usage patterns for the Lookless Controls.
-History of Changes
+
+### History of Changes
 
     Nov. 16, 2015 - added a table of contents; explained my using the term 'Lookless control' instead of 'Custom controls'
     Nov 19, 2015 - added a missing link to the source code
 
-Appedix A: Creating a UserControl in Visual Studio
+#### Appedix A: Creating a UserControl in Visual Studio
 
 In order to create a WPF UserControl in Visual Studio, right mouse click on the project in Solution Explorer; choose Add->New Item; then choose WPF on the left hand side and 'User Control (WPF)' on the right hand side and enter the name of the control:
 
  
 
-Appending B: Installing a Custom propdp Snippet
+#### Appending B: Installing a Custom propdp Snippet
 
 You can install the custom propdp snippet that comes with the code (in CODE/Snippets folder) by going through the following steps:
 
@@ -662,7 +666,7 @@ You can install the custom propdp snippet that comes with the code (in CODE/Snip
     Copy the propdp file that comes with this code into the snippet location.
     Restart your Visual Studio.
 
-Appending C: Creating a WPF Resource Dictionary File
+#### Appending C: Creating a WPF Resource Dictionary File
 
 You can create a ResourceDictionary file in Visual Studio via the following steps:
 
