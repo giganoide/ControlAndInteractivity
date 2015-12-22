@@ -1,8 +1,10 @@
 ﻿<Window x:Class="ControlAndInteractivity.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:ControlAndInteractivity"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+    <DockPanel LastChildFill="True">
+        <local:InputTextControl />
+        <Rectangle/>
+    </DockPanel>
 </Window>
