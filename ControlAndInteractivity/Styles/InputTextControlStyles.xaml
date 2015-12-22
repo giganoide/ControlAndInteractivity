@@ -1,0 +1,107 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:ControlAndInteractivity"
+                    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+                    xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions">
+    <ControlTemplate x:Key="PlainHorizontalEditableTextTemplate" TargetType="local:InputTextControl">
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Stretch">
+            <!-- bound to the Label dependency property of the control -->
+            <TextBlock x:Name="TheLabel"
+                       Text="{Binding Path=Label,
+                                          RelativeSource={RelativeSource TemplatedParent}}"
+                       Margin="0,0,2,0" />
+            <!-- bound to the EditableText dependency property of the control -->
+            <TextBox x:Name="TheTextBox"
+                     Text="{Binding Path=EditableText,
+                                        Mode=TwoWay,
+                                        RelativeSource={RelativeSource TemplatedParent}}"
+                     Width="100"
+                     Margin="2,0" />
+
+            <!-- We use Expression Blend's SDK's EventTrigger and CallMethodAction
+                     objects to wire Clear() method of the control 
+                     to the Click event of the button -->
+            <Button x:Name="TheClearButton"
+                    Content="X"
+                    Width="30">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:CallMethodAction MethodName="Clear"
+                                             TargetObject="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+        </StackPanel>
+    </ControlTemplate>
+    <Style TargetType="local:InputTextControl" x:Key="PlainHorizontalEditableTextStyle">
+        <Setter Property="HorizontalAlignment"
+                Value="Left"/>
+        <Setter Property="VerticalAlignment"
+                Value="Center"/>
+        <Setter Property="Margin"
+                Value="10,0,0,0"/>
+        <Setter Property="Template"
+                Value="{StaticResource PlainHorizontalEditableTextTemplate}"/>
+    </Style>
+
+    <ControlTemplate x:Key="SomeCrazyEditableTextTemplate" TargetType="local:InputTextControl">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <!-- bound to the Label dependency property of the control -->
+            <Label x:Name="TheLabel"
+                   Content="{Binding Path=Label,
+                                        RelativeSource={RelativeSource TemplatedParent}}"
+                   Margin="0,0,2,0"
+                   Background="Red"
+                   Grid.Row="1"
+                   RenderTransformOrigin="0.5,0.5">
+                <Label.RenderTransform>
+                    <RotateTransform Angle="-45" />
+                </Label.RenderTransform>
+            </Label>
+            <!-- bound to the EditableText dependency property of the control -->
+            <TextBox x:Name="TheTextBox"
+                     Text="{Binding Path=EditableText,
+                                    Mode=TwoWay,
+                                    RelativeSource={RelativeSource TemplatedParent}}"
+                     Width="100"
+                     Margin="2,0"
+                     Grid.Column="1" />
+
+            <!-- We use Expression Blend's SDK's EventTrigger and CallMethodAction
+                     objects to wire Clear() method of the control 
+                     to the Click event of the button -->
+            <ToggleButton x:Name="TheClearButton"
+                          Content="X"
+                          Width="30"
+                          Grid.Column="2"
+                          Grid.Row="1">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <ei:CallMethodAction MethodName="Clear"
+                                             TargetObject="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </ToggleButton>
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="local:InputTextControl" x:Key="SomeCrazyEditableTextStyle">
+        <Setter Property="HorizontalAlignment"
+                Value="Left" />
+        <Setter Property="VerticalAlignment"
+                Value="Center" />
+        <Setter Property="Margin"
+                Value="10,0,0,0" />
+        <Setter Property="Template"
+                Value="{StaticResource SomeCrazyEditableTextTemplate}" />
+    </Style>
+</ResourceDictionary>

@@ -6,39 +6,15 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-        <ControlTemplate x:Key="PlainHorizontalInputTextControlTemplate" TargetType="local:InputTextControl">
-            <StackPanel Orientation="Horizontal"
-                        VerticalAlignment="Stretch">
-                <!-- bound to the Label dependency property of the control -->
-                <TextBlock x:Name="TheLabel"
-                           Text="{Binding Path=Label,
-                                          RelativeSource={RelativeSource TemplatedParent}}"
-                           Margin="0,0,2,0" />
-                <!-- bound to the EditableText dependency property of the control -->
-                <TextBox x:Name="TheTextBox"
-                         Text="{Binding Path=EditableText,
-                                        Mode=TwoWay,
-                                        RelativeSource={RelativeSource TemplatedParent}}"
-                         Width="100"
-                         Margin="2,0" />
-
-                <!-- We use Expression Blend's SDK's EventTrigger and CallMethodAction
-                     objects to wire Clear() method of the control 
-                     to the Click event of the button -->
-                <Button x:Name="TheClearButton"
-                        Content="X"
-                        Width="30">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <ei:CallMethodAction MethodName="Clear" TargetObject="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Button>
-            </StackPanel>
-        </ControlTemplate>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles/InputTextControlStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     <DockPanel LastChildFill="True" Margin="10">
-        <local:InputTextControl DockPanel.Dock="Top" Label="Insert your name" Template="{StaticResource PlainHorizontalInputTextControlTemplate}" />
+        <local:InputTextControl DockPanel.Dock="Top" Label="Enter your name:" Style="{StaticResource PlainHorizontalEditableTextStyle}" />
+        <local:InputTextControl DockPanel.Dock="Top"  Label="Enter your name:" Style="{StaticResource SomeCrazyEditableTextStyle}" />
         <Rectangle/>
     </DockPanel>
 </Window>
